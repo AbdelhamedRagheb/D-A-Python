@@ -1,16 +1,38 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+# the simulation
+from Queue1 import Queue1
+from Printer import *
+from Task import *
+import random
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+def simulation(numSeconds, pagesPerMinute):
+    """Simulation function"""
+    labPrinter = Printer(pagesPerMinute)
+    printQueue = Queue1()
+    waitingTime = []
+    for currentSecound in range(numSeconds):
+        """check if there are new task"""
+        if random.randrange(1, 181) == 180:
+            task = Task(currentSecound)
+            printQueue.enqueue(task)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+        if (not labPrinter.busy()) and (not printQueue.isEmpty()):
+            nextTask = printQueue.dequeue()
+            waitingTime.append(nextTask.waitTime(currentSecound))
+            labPrinter.startNext(nextTask)
+        # timer - 1
+        labPrinter.tick()
+
+
+
+    averageWait = sum(waitingTime) // len(waitingTime)
+    print("Average Wait", averageWait, "Secs", printQueue.size(), "tasks-remaining")
+
+
+def main():
+    for i in range(10):
+        simulation(3600, 10)
+
+
+if "__main__" == __name__:
+    main()
